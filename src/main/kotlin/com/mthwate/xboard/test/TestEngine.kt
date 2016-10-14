@@ -2,7 +2,6 @@ package com.mthwate.xboard.test
 
 import com.mthwate.xboard.api.ChessEngine
 import com.mthwate.xboard.api.CmdIssuer
-import com.mthwate.xboard.api.Color
 import com.mthwate.xboard.api.Move
 
 /**
@@ -21,8 +20,8 @@ class TestEngine(val issuer: CmdIssuer) : ChessEngine() {
 		var bestMove: Move = Move(-1, -1, -1, -1)
 		var bestVal: Int = Int.MIN_VALUE
 
-		board.getMoves(color == Color.WHITE).forEach {
-			val minimax = Minimax().run(board.move(it), color == Color.WHITE)
+		board.getMoves().forEach {
+			val minimax = Minimax().run(board.move(it))
 			if (minimax > bestVal) {
 				bestMove = it
 				bestVal = minimax

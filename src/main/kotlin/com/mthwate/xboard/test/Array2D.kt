@@ -1,6 +1,6 @@
 package com.mthwate.xboard.test
 
-import java.util.Arrays
+import java.util.*
 
 /**
  * @author mthwate

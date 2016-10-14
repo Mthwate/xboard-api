@@ -1,9 +1,7 @@
 package com.mthwate.xboard.api
 
-import java.io.FileNotFoundException
 import java.io.PrintWriter
-import java.util.HashMap
-import java.util.Scanner
+import java.util.*
 import java.util.regex.Pattern
 
 /**

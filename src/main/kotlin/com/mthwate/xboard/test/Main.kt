@@ -2,8 +2,6 @@ package com.mthwate.xboard.test
 
 import com.mthwate.xboard.api.CmdIssuer
 import com.mthwate.xboard.api.EngineHandler
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 /**
  * @author mthwate

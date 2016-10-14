@@ -1,7 +1,6 @@
 package com.mthwate.xboard.test
 
 import com.mthwate.xboard.api.Move
-import com.mthwate.xboard.test.Board
 import java.util.*
 
 /**

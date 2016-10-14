@@ -1,5 +1,6 @@
 package com.mthwate.xboard.test
 
+import com.mthwate.xboard.api.Color
 import com.mthwate.xboard.api.Move
 import com.mthwate.xboard.test.piece.*
 import java.util.*
@@ -7,7 +8,7 @@ import java.util.*
 /**
  * @author mthwate
  */
-class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>) : Cloneable {
+class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>, val turn: Color) {
 
 	constructor(): this(
 			Array2D<Piece?>(8, 8) { x, y ->
@@ -24,27 +25,25 @@ class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>) : Cloneab
 					else -> null
 				}
 			},
-			Array2D<Boolean>(8, 8) { x, y -> (y < 4) }
+			Array2D<Boolean>(8, 8) { x, y -> (y < 4) },
+			Color.WHITE
 	)
 
 	fun move(move: Move): Board {
-		val clone = clone()
-		clone.pieces[move.fx, move.fy] = move.piece ?: clone.pieces[move.ix, move.iy]
-		clone.colors[move.fx, move.fy] = clone.colors[move.ix, move.iy]
-		clone.pieces[move.ix, move.iy] = null
-		return clone
+		//TODO validation
+		val newBoard = Board(pieces.clone(), colors.clone(), !turn)
+		newBoard.pieces[move.fx, move.fy] = move.piece ?: newBoard.pieces[move.ix, move.iy]
+		newBoard.colors[move.fx, move.fy] = newBoard.colors[move.ix, move.iy]
+		newBoard.pieces[move.ix, move.iy] = null
+		return newBoard
 	}
 
-	override fun clone(): Board {
-		return Board(pieces.clone(), colors.clone())
-	}
-
-	fun getMoves(white: Boolean): List<Move> {
+	fun getMoves(): List<Move> {
 		val moves = LinkedList<Move>()
 		pieces.array.forEachIndexed { i, piece ->
-			if (piece != null && colors.array[i] == white) {
+			if (piece != null && colors.array[i] == turn.isWhite()) {
 				piece.moves(this, i % 8, i / 8).forEach {
-					if (!this.move(it).inCheck(white)) {
+					if (!this.move(it).inCheck(turn)) {
 						moves.add(it)
 					}
 				}
@@ -53,12 +52,12 @@ class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>) : Cloneab
 		return moves
 	}
 
-	fun inCheck(white: Boolean): Boolean {
+	fun inCheck(color: Color): Boolean {
 		var kx = 0
 		var ky = 0
 		for (x in 0..7) {
 			for (y in 0..7) {
-				if (pieces[x, y] == King && colors[x, y] == white) {
+				if (pieces[x, y] == King && colors[x, y] == color.isWhite()) {
 					kx = x
 					ky = y
 					//TODO break?
@@ -80,19 +79,19 @@ class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>) : Cloneab
 			val nx = kx + it.first
 			val ny = ky + it.second
 			if (nx in 0..7 && ny in 0..7) {
-				if (pieces[nx, ny] == Knight && colors[nx, ny] != white) {
+				if (pieces[nx, ny] == Knight && colors[nx, ny] != color.isWhite()) {
 					return true
 				}
 			}
 		}
 
 
-		val pi = if (white) 1 else -1
+		val pi = if (color.isWhite()) 1 else -1
 		if (ky + pi in 0..7) {
-			if (kx + 1 in 0..7 && colors[kx + 1, ky + pi] != white && pieces[kx + 1, ky + pi] == Pawn) {
+			if (kx + 1 in 0..7 && colors[kx + 1, ky + pi] != color.isWhite() && pieces[kx + 1, ky + pi] == Pawn) {
 				return true
 			}
-			if (kx - 1 in 0..7 && colors[kx - 1, ky + pi] != white && pieces[kx - 1, ky + pi] == Pawn) {
+			if (kx - 1 in 0..7 && colors[kx - 1, ky + pi] != color.isWhite() && pieces[kx - 1, ky + pi] == Pawn) {
 				return true
 			}
 		}
@@ -153,11 +152,11 @@ class Board(val pieces: Array2D<Piece?>, val colors: Array2D<Boolean>) : Cloneab
 		return sb.toString()
 	}
 
-	fun getValue(white: Boolean): Int {
+	fun getValue(color: Color): Int {
 		var value = 0
 		pieces.array.forEachIndexed { i, piece ->
 			if (piece != null) {
-				value += piece.value * if (colors.array[i] == white) 1 else -1
+				value += piece.value * if (colors.array[i] == color.isWhite()) 1 else -1
 			}
 		}
 		return value
